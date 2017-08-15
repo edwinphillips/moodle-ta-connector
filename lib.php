@@ -26,30 +26,6 @@
 define('LOCAL_TEFLACADEMYCONNECTOR_STUDENT_SHORTNAME', 'student');
 
 /**
- * Generates a unique username from the passed firstname and lastname
- *
- * @param string $firstname Passed user firstname
- * @param string $lastname Passed user lastname
- * @return $string
- */
-function local_teflacademyconnector_generate_username($firstname, $lastname) {
-    global $DB;
-
-    $username = strtolower($firstname . substr($lastname, 0, 1));
-
-    $i = 1;
-    if ($DB->record_exists('user', array('username' => $username))) {
-        $username .= $i;
-        while ($DB->record_exists('user', array('username' => $username))) {
-            $username = substr($username, 0, -1 * strlen("$i")) . $i;
-            $i++;
-        }
-    }
-
-    return $username;
-}
-
-/**
  * Returns details from the The TEFL Academy website report table
  *
  * @return array
