@@ -99,18 +99,18 @@ class local_teflacademyconnector_external extends external_api {
 
         $roleid = $DB->get_field('role', 'id', array('shortname' => LOCAL_TEFLACADEMYCONNECTOR_STUDENT_SHORTNAME));
 
-        $enrol = enrol_get_plugin('teflacademy');
+        $enrol = enrol_get_plugin('theteflacademy');
 
         foreach ($moodle_courses as $moodle_course) {
             if ($course = $DB->get_record('course', array('idnumber' => $moodle_course['course_id']))) {
-                $enrolinstance = $DB->get_record('enrol', array('courseid' => $course->id,'enrol' => 'teflacademy'), '*', MUST_EXIST);
+                $enrolinstance = $DB->get_record('enrol', array('courseid' => $course->id, 'enrol' => 'theteflacademy'), '*', MUST_EXIST);
                 $enrol->enrol_user($enrolinstance, $userid, $roleid);
                 $record = new stdClass();
                 $record->userid = $userid;
                 $record->ordernum = $order_number;
                 $record->courseid = $course->id;
                 $record->timestamp = time();
-                $DB->insert_record('local_teflacademyconnector_trans', $record);
+                $DB->insert_record('local_teflacademyconnector', $record);
             } else {
                 // no such course ... ?
             }
