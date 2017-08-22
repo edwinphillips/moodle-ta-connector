@@ -25,23 +25,11 @@
 
 defined('MOODLE_INTERNAL') || die;
 
-$systemcontext = context_system::instance();
-
-if (has_any_capability(array('local/teflacademyconnector:manage', 'local/teflacademyconnector:viewtransactions'), $systemcontext)) {
-    $ADMIN->add('localplugins', new admin_category('teflacademyconnector', new lang_string('pluginname','local_teflacademyconnector')));
-}
-
-if (has_capability('local/teflacademyconnector:manage', $systemcontext)) {
-    $settings = new admin_settingpage('teflacademyconnectorsettings', new lang_string('settings'));
-    $options = array(1 => get_string('yes'), 0 => get_string('no'));
-    $settings->add(new admin_setting_configselect('teflacademyconnector/teflacademyconnectorenabled',
-            get_string('enabled', 'local_teflacademyconnector'),
-            get_string('enableordisable', 'local_teflacademyconnector'), 1, $options));
-    $ADMIN->add('teflacademyconnector', $settings);
-
-}
-
-if (has_capability('local/teflacademyconnector:viewtransactions', $systemcontext)) {
-    $ADMIN->add('teflacademyconnector', new admin_externalpage('teflacademyconnectortransactions', get_string('transactions', 'local_teflacademyconnector'),
-        $CFG->wwwroot . '/local/teflacademyconnector/viewtransactions.php'));
+if (has_capability('local/teflacademyconnector:viewactivityreport', context_system::instance())) {
+    $ADMIN->add(
+            'localplugins',
+            new admin_externalpage('teflacademyconnectoractivityreport',
+                    get_string('tawebsiteconnectoractivityreport', 'local_teflacademyconnector'),
+                    $CFG->wwwroot . '/local/teflacademyconnector/viewactivityreport.php')
+    );
 }

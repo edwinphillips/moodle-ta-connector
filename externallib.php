@@ -38,7 +38,7 @@ class local_teflacademyconnector_external extends external_api {
         return new external_function_parameters(
             array(
                 'order_number' => new external_value(PARAM_TEXT),
-                'customer'     => new external_single_structure(
+                'user'         => new external_single_structure(
                     array(
                         'firstname' => new external_value(PARAM_TEXT),
                         'lastname'  => new external_value(PARAM_TEXT),
@@ -49,10 +49,10 @@ class local_teflacademyconnector_external extends external_api {
                         'password'  => new external_value(PARAM_TEXT)
                     )
                 ),
-                'moodle_courses' => new external_multiple_structure(
+                'courses' => new external_multiple_structure(
                     new external_single_structure(
                         array(
-                            'course_id' => new external_value(PARAM_TEXT)
+                            'idnumber' => new external_value(PARAM_TEXT)
                         )
                     )
                 )
@@ -65,40 +65,41 @@ class local_teflacademyconnector_external extends external_api {
      *
      * @return bool success or failure
      */
-    public static function process_teflacademy_request($order_number, $customer, $moodle_courses) {
+    public static function process_teflacademy_request($order_number, $userdata, $coursesdata) {
         global $USER, $DB;
-
-        if (get_config('teflacademyconnector', 'teflacademyconnectorenabled') == 0) {
-            return false;
-        }
 
         $params = self::validate_parameters(
             self::process_teflacademy_request_parameters(),
             array(
-                'order_number'   => $order_number,
-                'customer'       => $customer,
-                'moodle_courses' => $moodle_courses
+                'order_number' => $order_number,
+                'user'         => $userdata,
+                'courses'      => $coursesdata
             )
         );
 
         $context = context_user::instance($USER->id);
         self::validate_context($context);
 
-        if (!$user = $DB->get_record('user', array('email' => $customer['email']))) {
+        if (!$user = $DB->get_record('user', array('email' => $userdata['email']))) {
 
             $user = new stdClass();
-            $user->firstname    = $customer['firstname'];
-            $user->lastname     = $customer['lastname'];
-            $user->email        = $customer['email'];
-            $user->city         = $customer['city'];
-            $user->country      = $customer['country'];
-            $user->username     = $customer['username'];
-            $user->password     = hash_internal_user_password($customer['password']);
+            $user->firstname    = $userdata['firstname'];
+            $user->lastname     = $userdata['lastname'];
+            $user->email        = $userdata['email'];
+            $user->city         = $userdata['city'];
+            $user->country      = $userdata['country'];
+            // Todo: add a username check; autogenerate username vv
+            $user->username     = $userdata['username'];
+            $user->password     = hash_internal_user_password($userdata['password']);
             $user->timecreated  = time();
             $user->confirmed    = 1;
             $user->policyagreed = 1;
             $user->mnethostid   = 1;
-            $userid = $DB->insert_record('user', $user);
+
+            if ($userid =  user_create_user($user, true)) {
+                // anthing required here?
+            }
+
         } else {
 
             $userid = $user->id;
@@ -106,17 +107,18 @@ class local_teflacademyconnector_external extends external_api {
 
         $roleid = $DB->get_field('role', 'id', array('shortname' => LOCAL_TEFLACADEMYCONNECTOR_STUDENT_SHORTNAME));
 
-        $enrol = enrol_get_plugin('theteflacademy');
+        $enrol = enrol_get_plugin('manual');
 
-        foreach ($moodle_courses as $moodle_course) {
-            if ($course = $DB->get_record('course', array('idnumber' => $moodle_course['course_id']))) {
+        foreach ($coursesdata as $coursedata) {
+            if ($course = $DB->get_record('course', array('idnumber' => $coursedata['course_id']))) {
 
-                $enrolinstance = $DB->get_record('enrol', array('courseid' => $course->id, 'enrol' => 'theteflacademy'), '*', MUST_EXIST);
+                $enrolinstance = $DB->get_record('enrol',
+                        array('courseid' => $course->id, 'enrol' => 'theteflacademy'), '*', MUST_EXIST);
                 $enrol->enrol_user($enrolinstance, $userid, $roleid);
 
                 $record = new stdClass();
                 $record->userid    = $userid;
-                $record->ordernum  = $order_number;
+                $record->orderid   = $order_number;
                 $record->courseid  = $course->id;
                 $record->timestamp = time();
                 $DB->insert_record('local_teflacademyconnector', $record);

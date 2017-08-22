@@ -28,7 +28,7 @@ $functions = array(
         'classname'   => 'local_teflacademyconnector_external',
         'methodname'  => 'process_teflacademy_request',
         'classpath'   => 'local/teflacademyconnector/externallib.php',
-        'description' => 'Receives data from The TEFL Academy website and initiates an enrolment with The TEFL Academy Enrolment plugin',
+        'description' => 'Receives data from The TEFL Academy website, creates a Moodle user if neccessary, and initiates a course enrolment of type manual.',
         'type'        => 'write',
     )
 );
