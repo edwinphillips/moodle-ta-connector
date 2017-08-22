@@ -28,57 +28,57 @@ require_once($CFG->dirroot.'/user/profile/lib.php');
 
 class local_teflacademyconnector_renderer extends core_renderer {
 
-    public function list_transactions($transactions) {
+    public function list_activityreport($activityreport) {
         global $CFG;
 
-        $table = new flexible_table('local-teflacademyconnector-transaction-list');
-        $table->define_columns(array('user', 'course', 'transactionid', 'timestamp'));
+        $table = new flexible_table('local-teflacademyconnector-activity-list');
+        $table->define_columns(array('user', 'course', 'orderid', 'timestamp'));
 
         $table->define_headers(array(
             get_string('user'),
             get_string('course'),
-            get_string('transactionid', 'local_teflacademyconnector'),
+            get_string('orderid', 'local_teflacademyconnector'),
             get_string('timestamp', 'local_teflacademyconnector')
         ));
-        $table->define_baseurl(new moodle_url('/local/teflacademyconnector/viewtransactions.php'));
+        $table->define_baseurl(new moodle_url('/local/teflacademyconnector/viewactivityreport.php'));
 
         $table->sortable(false);
         $table->collapsible(false);
 
         $table->column_class('user', 'user');
         $table->column_class('course', 'course');
-        $table->column_class('transactionid', 'transactionid');
+        $table->column_class('orderid', 'orderid');
         $table->column_class('timestamp', 'timestamp');
 
         $table->set_attribute('cellspacing', '0');
-        $table->set_attribute('id', 'local-teflacademyconnector-transaction-list');
-        $table->set_attribute('class', 'local-teflacademyconnector-transaction-list generaltable');
+        $table->set_attribute('id', 'local-teflacademyconnector-activity-list');
+        $table->set_attribute('class', 'local-teflacademyconnector-activity-list generaltable');
         $table->set_attribute('width', '100%');
         $table->setup();
 
-        if ($transactions) {
+        if ($activityreport) {
 
             $user = new stdClass();
-            foreach ($transactions as $transaction) {
+            foreach ($activityreport as $activity) {
 
-                $user->id                = $transaction->userid;
-                $user->firstname         = $transaction->firstname;
-                $user->lastname          = $transaction->lastname;
-                $user->firstnamephonetic = $transaction->firstnamephonetic;
-                $user->lastnamephonetic  = $transaction->lastnamephonetic;
-                $user->middlename        = $transaction->middlename;
-                $user->alternatename     = $transaction->alternatename;
+                $user->id                = $activity->userid;
+                $user->firstname         = $activity->firstname;
+                $user->lastname          = $activity->lastname;
+                $user->firstnamephonetic = $activity->firstnamephonetic;
+                $user->lastnamephonetic  = $activity->lastnamephonetic;
+                $user->middlename        = $activity->middlename;
+                $user->alternatename     = $activity->alternatename;
 
                 $row = array();
 
                 $userurl = new moodle_url($CFG->wwwroot . '/user/profile.php', array('id' => $user->id));
                 $row[] = html_writer::link($userurl, fullname($user), array('title' => get_string('viewprofile')));
 
-                $courseurl = new moodle_url($CFG->wwwroot . '/course/view.php', array('id' => $transaction->courseid));
-                $row[] = html_writer::link($courseurl, $transaction->course, array('title' => $transaction->course));
+                $courseurl = new moodle_url($CFG->wwwroot . '/course/view.php', array('id' => $activity->courseid));
+                $row[] = html_writer::link($courseurl, $activity->course, array('title' => $activity->course));
 
-                $row[] = $transaction->ordernum;
-                $row[] = userdate($transaction->timestamp, get_string('strftimedatetime'));
+                $row[] = $activity->orderid;
+                $row[] = userdate($activity->timestamp, get_string('strftimedatetime'));
 
                 $table->add_data($row);
             }

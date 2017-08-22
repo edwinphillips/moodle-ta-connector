@@ -28,23 +28,23 @@ require_once($CFG->dirroot . '/local/teflacademyconnector/lib.php');
 require_once($CFG->libdir . '/adminlib.php');
 
 $context = context_system::instance();
-require_capability('local/teflacademyconnector:viewtransactions', $context);
+require_capability('local/teflacademyconnector:viewactivityreport', $context);
 
 $PAGE->set_context($context);
 $PAGE->set_heading(format_string($SITE->fullname));
 $PAGE->set_title(format_string($SITE->fullname) . ': ' . get_string('pluginname', 'local_teflacademyconnector'));
-$PAGE->set_url('/local/teflacademyconnector/viewtransactions.php');
+$PAGE->set_url('/local/teflacademyconnector/viewactivityreport.php');
 $PAGE->set_pagetype('admin-teflacademyconnector');
 
-admin_externalpage_setup('teflacademyconnectortransactions');
+admin_externalpage_setup('teflacademyconnectoractivityreport');
 
 $renderer = $PAGE->get_renderer('local_teflacademyconnector');
 
 echo $OUTPUT->header();
 
-echo $renderer->heading(get_string('enrolmenttransactions', 'local_teflacademyconnector'));
+echo $renderer->heading(get_string('tawebsiteconnectoractivityreport', 'local_teflacademyconnector'));
 
-$transactions = local_teflacademyconnector_get_transactions();
-echo $renderer->list_transactions($transactions);
+$activityreport = local_teflacademyconnector_get_activityreport();
+echo $renderer->list_activityreport($activityreport);
 
 echo $OUTPUT->footer();

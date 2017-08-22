@@ -24,11 +24,7 @@
  */
 
 $string['pluginname'] = 'The TEFL Academy Website Connector';
-$string['transactions'] = 'Transactions';
-$string['enrolmenttransactions'] = 'Enrolment Transactions';
-$string['teflacademyconnector:manage'] = 'Manage The TEFL Academy Website Connector settings';
-$string['teflacademyconnector:viewtransactions'] = 'View The TEFL Academy Website Connector transactions/enrolment report';
-$string['transactionid'] = 'Transaction ID';
+$string['tawebsiteconnectoractivityreport'] = 'The TEFL Academy Website Connector Activity Report';
+$string['teflacademyconnector:viewactivityreport'] = 'View The TEFL Academy Website Connector activity report';
+$string['orderid'] = 'Order ID';
 $string['timestamp'] = 'Timestamp';
-$string['enableordisable'] = 'Enable or disable The TEFL Academy Website Connector';
-$string['enabled'] = 'Enabled';

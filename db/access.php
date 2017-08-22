@@ -24,15 +24,7 @@
  */
 
 $capabilities = array(
-    'local/teflacademyconnector:manage' => array(
-        'riskbitmask'   => RISK_CONFIG,
-        'captype' => 'write',
-        'contextlevel' => CONTEXT_SYSTEM,
-        'archetypes' => array(
-            'manager' => CAP_ALLOW
-        )
-    ),
-    'local/teflacademyconnector:viewtransactions' => array(
+    'local/teflacademyconnector:viewactivityreport' => array(
         'riskbitmask'   => RISK_PERSONAL,
         'captype' => 'read',
         'contextlevel' => CONTEXT_SYSTEM,
