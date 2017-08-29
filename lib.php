@@ -32,10 +32,9 @@ function local_teflacademyconnector_get_activityreport() {
     global $DB;
 
     $sql = "SELECT t.id, u.id AS userid, u.firstnamephonetic, u.lastnamephonetic, u.middlename, u.alternatename,
-                   u.firstname, u.lastname, c.id AS courseid, c.fullname AS course, t.orderid, t.timestamp
+                   u.firstname, u.lastname, t.courseinfo AS course, t.orderid, t.timestamp
               FROM {local_teflacademyconnector} t
               JOIN {user} u ON u.id = t.userid
-              JOIN {course} c ON c.id = t.courseid
           ORDER BY id DESC";
 
     return $DB->get_records_sql($sql);

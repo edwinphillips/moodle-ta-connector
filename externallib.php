@@ -87,8 +87,6 @@ class local_teflacademyconnector_external extends external_api {
         if (!$user = $DB->get_record('user', array('email' => $userdata['email']))) {
 
             $user = new stdClass();
-
-            // Todo: add a username check; autogenerate username vv -- where does username come from?
             $user->username     = $userdata['username'];
             $user->password     = $userdata['password'];
             $user->firstname    = $userdata['firstname'];

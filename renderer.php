@@ -73,11 +73,8 @@ class local_teflacademyconnector_renderer extends core_renderer {
 
                 $userurl = new moodle_url($CFG->wwwroot . '/user/profile.php', array('id' => $user->id));
                 $row[] = html_writer::link($userurl, fullname($user), array('title' => get_string('viewprofile')));
-
-                $courseurl = new moodle_url($CFG->wwwroot . '/course/view.php', array('id' => $activity->courseid));
-                $row[] = html_writer::link($courseurl, $activity->course, array('title' => $activity->course));
-
-                $row[] = $activity->orderid;
+                $row[] = $activity->course;
+                $row[] = 'OID' . $activity->orderid;
                 $row[] = userdate($activity->timestamp, get_string('strftimedatetime'));
 
                 $table->add_data($row);
