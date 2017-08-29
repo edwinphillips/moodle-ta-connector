@@ -55,6 +55,7 @@ class local_teflacademyconnector_external extends external_api {
                 'courseidnumber' => new external_value(PARAM_TEXT),
                 'taorderid'      => new external_value(PARAM_TEXT),
                 'tacourseid'     => new external_value(PARAM_TEXT),
+                'tacourseinfo'   => new external_value(PARAM_TEXT),
             )
         );
     }
@@ -64,7 +65,7 @@ class local_teflacademyconnector_external extends external_api {
      *
      * @return bool success or failure
      */
-    public static function process_teflacademy_request($userdata, $courseidnumber, $taorderid, $tacourseid) {
+    public static function process_teflacademy_request($userdata, $courseidnumber, $taorderid, $tacourseid, $tacourseinfo) {
         global $USER, $DB, $CFG;
 
         $params = self::validate_parameters(
@@ -74,6 +75,7 @@ class local_teflacademyconnector_external extends external_api {
                 'courseidnumber' => $courseidnumber,
                 'taorderid'      => $taorderid,
                 'tacourseid'     => $tacourseid,
+                'tacourseinfo'   => $tacourseinfo
             )
         );
 
@@ -125,11 +127,12 @@ class local_teflacademyconnector_external extends external_api {
 
             // Record activity.
             $record = new stdClass();
-            $record->userid     = $userid;
-            $record->orderid    = $taorderid;
-            $record->courseid   = $course->id;
-            $record->tacourseid = $tacourseid;
-            $record->timestamp  = $now;
+            $record->userid       = $userid;
+            $record->orderid      = $taorderid;
+            $record->courseid     = $course->id;
+            $record->tacourseid   = $tacourseid;
+            $record->tacourseinfo = $tacourseinfo;
+            $record->timestamp    = $now;
 
             $DB->insert_record('local_teflacademyconnector', $record);
 

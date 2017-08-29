@@ -25,6 +25,23 @@
 
 defined('MOODLE_INTERNAL') || die();
 
-$plugin->version   = 2017082901;
-$plugin->requires  = 2017051501;
-$plugin->component = 'local_teflacademyconnector';
+function xmldb_local_teflacademyconnector_upgrade($oldversion) {
+    global $DB;
+
+    $dbman = $DB->get_manager();
+
+    if ($oldversion < 2017082901) {
+
+        // Add field tacourseinfo to table local_teflacademyconnector.
+        $table = new xmldb_table('local_teflacademyconnector');
+
+        $field = new xmldb_field('tacourseinfo', XMLDB_TYPE_CHAR, '255', null, XMLDB_NOTNULL, null, null, 'tacourseid');
+        if (!$dbman->field_exists($table, $field)) {
+            $dbman->add_field($table, $field);
+        }
+
+        upgrade_plugin_savepoint(true, 2017082901, 'local', 'teflacademyconnector');
+    }
+
+    return true;
+}
