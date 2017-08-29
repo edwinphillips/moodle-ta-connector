@@ -23,22 +23,23 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
+$services = array(
+    'The TEFL Academy website connector' => array(
+        'functions'          => array('local_teflacademyconnector_process_request'),
+        'requiredcapability' => 'local/teflacademyconnector:processrequest',
+        'restrictedusers'    => 0,
+        'enabled'            => 1,
+        'shortname'          => 'teflacademyconnector',
+        'downloadfiles'      => 1
+    )
+);
+
 $functions = array(
     'local_teflacademyconnector_process_request' => array(
         'classname'   => 'local_teflacademyconnector_external',
         'methodname'  => 'process_teflacademy_request',
         'classpath'   => 'local/teflacademyconnector/externallib.php',
-        'description' => 'Receives data from The TEFL Academy website, creates a Moodle user if neccessary, and initiates a course enrolment of type manual.',
+        'description' => 'Receives data from The TEFL Academy website, creates a Moodle user if neccessary, and initiates a course enrolment of type manual into the requested course.',
         'type'        => 'write',
-    )
-);
-
-$services = array(
-    'The TEFL Academy website connector' => array(
-        'functions'       => array('local_teflacademyconnector_process_request'),
-        'restrictedusers' => 0,
-        'enabled'         => 1,
-        'shortname'       => 'teflacademyconnector',
-        'downloadfiles'   => 1
     )
 );

@@ -25,6 +25,7 @@
 
 $string['pluginname'] = 'The TEFL Academy Website Connector';
 $string['tawebsiteconnectoractivityreport'] = 'The TEFL Academy Website Connector Activity Report';
+$string['teflacademyconnector:processrequest'] = 'Process requests made to The TEFL Academy Website Connector web service';
 $string['teflacademyconnector:viewactivityreport'] = 'View The TEFL Academy Website Connector activity report';
 $string['orderid'] = 'Order ID';
 $string['timestamp'] = 'Timestamp';

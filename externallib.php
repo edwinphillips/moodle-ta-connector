@@ -26,6 +26,8 @@
 require_once($CFG->libdir . '/externallib.php');
 require_once($CFG->dirroot . '/user/lib.php');
 
+define('LOCAL_TEFLACADEMYCONNECTOR_STUDENT_SHORTNAME', 'student');
+
 class local_teflacademyconnector_external extends external_api {
 
     /**
@@ -37,22 +39,21 @@ class local_teflacademyconnector_external extends external_api {
 
         return new external_function_parameters(
             array(
-                'user'           => new external_single_structure(
+                'userdata'          => new external_single_structure(
                     array(
+                        'username'  => new external_value(PARAM_TEXT),
+                        'password'  => new external_value(PARAM_TEXT),
                         'firstname' => new external_value(PARAM_TEXT),
                         'lastname'  => new external_value(PARAM_TEXT),
                         'email'     => new external_value(PARAM_TEXT),
                         'city'      => new external_value(PARAM_TEXT),
                         'country'   => new external_value(PARAM_TEXT),
-                        'username'  => new external_value(PARAM_TEXT),
-                        'password'  => new external_value(PARAM_TEXT),
-                        'studentid' => new external_value(PARAM_TEXT),
-                        'dob'       => new external_value(PARAM_TEXT),
+                        'idnumber' => new external_value(PARAM_TEXT),
                         'phone'     => new external_value(PARAM_TEXT),
                     )
                 ),
-                'orderid'        => new external_value(PARAM_TEXT),
                 'courseidnumber' => new external_value(PARAM_TEXT),
+                'taorderid'      => new external_value(PARAM_TEXT),
                 'tacourseid'     => new external_value(PARAM_TEXT),
             )
         );
@@ -63,15 +64,15 @@ class local_teflacademyconnector_external extends external_api {
      *
      * @return bool success or failure
      */
-    public static function process_teflacademy_request($userdata, $orderid, $courseidnumber, $tacourseid) {
-        global $USER, $DB;
+    public static function process_teflacademy_request($userdata, $courseidnumber, $taorderid, $tacourseid) {
+        global $USER, $DB, $CFG;
 
         $params = self::validate_parameters(
             self::process_teflacademy_request_parameters(),
             array(
-                'user'           => $userdata,
-                'orderid'        => $orderid,
+                'userdata'       => $userdata,
                 'courseidnumber' => $courseidnumber,
+                'taorderid'      => $taorderid,
                 'tacourseid'     => $tacourseid,
             )
         );
@@ -79,27 +80,26 @@ class local_teflacademyconnector_external extends external_api {
         $context = context_user::instance($USER->id);
         self::validate_context($context);
 
+        $now = time();
+
         if (!$user = $DB->get_record('user', array('email' => $userdata['email']))) {
 
             $user = new stdClass();
+
+            // Todo: add a username check; autogenerate username vv -- where does username come from?
+            $user->username     = $userdata['username'];
+            $user->password     = $userdata['password'];
             $user->firstname    = $userdata['firstname'];
             $user->lastname     = $userdata['lastname'];
             $user->email        = $userdata['email'];
             $user->city         = $userdata['city'];
             $user->country      = $userdata['country'];
-            $user->idnumber     = $userdata['studentid'];
+            $user->idnumber     = $userdata['idnumber'];
             $user->phone1       = $userdata['phone'];
+            $user->mnethostid   = $CFG->mnet_localhost_id;
+            $user->confirmed    = 1;
 
-            // Todo: add a username check; autogenerate username vv
-            $user->username     = $userdata['username'];
-
-            $user->password     = hash_internal_user_password($userdata['password']);
-            $user->timecreated  = time();
-            $user->confirmed    = 1; //?
-            $user->policyagreed = 1; //?
-            $user->mnethostid   = 1;
-
-            if ($userid =  user_create_user($user, true)) {
+            if ($userid = user_create_user($user, true)) {
                 // anthing required here?
             }
 
@@ -111,21 +111,26 @@ class local_teflacademyconnector_external extends external_api {
         // Get course Id for requested enrolment.
         if ($course = $DB->get_record('course', array('idnumber' => $courseidnumber))) {
 
-            // Identify enrol instance.
+            // Identify manual enrolment instance.
             $enrolinstance = $DB->get_record('enrol', array('courseid' => $course->id, 'enrol' => 'manual'), '*', MUST_EXIST);
 
-            // Enrol user as a student.
+            // Enrol user as a student using the enrolment instance.
             $roleid = $DB->get_field('role', 'id', array('shortname' => LOCAL_TEFLACADEMYCONNECTOR_STUDENT_SHORTNAME));
+
+            $timestart = mktime(0, 0, 0, date('n', $now), date('j', $now), date('Y', $now));
+            $timeend = strtotime('+6 month', $timestart);
+
             $enrol = enrol_get_plugin('manual');
-            $enrol->enrol_user($enrolinstance, $userid, $roleid);
+            $enrol->enrol_user($enrolinstance, $userid, $roleid, $timestart, $timeend);
 
             // Record activity.
             $record = new stdClass();
             $record->userid     = $userid;
-            $record->orderid    = $orderid;
+            $record->orderid    = $taorderid;
             $record->courseid   = $course->id;
             $record->tacourseid = $tacourseid;
-            $record->timestamp  = time();
+            $record->timestamp  = $now;
+
             $DB->insert_record('local_teflacademyconnector', $record);
 
         } else {

@@ -23,8 +23,6 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-define('LOCAL_TEFLACADEMYCONNECTOR_STUDENT_SHORTNAME', 'student');
-
 /**
  * Returns details from the The TEFL Academy Website Connector report table
  *

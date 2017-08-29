@@ -24,6 +24,14 @@
  */
 
 $capabilities = array(
+    'local/teflacademyconnector:processrequest' => array(
+        'riskbitmask'   => RISK_PERSONAL,
+        'captype' => 'read',
+        'contextlevel' => CONTEXT_SYSTEM,
+        'archetypes' => array(
+            'manager' => CAP_ALLOW
+        )
+    ),
     'local/teflacademyconnector:viewactivityreport' => array(
         'riskbitmask'   => RISK_PERSONAL,
         'captype' => 'read',
