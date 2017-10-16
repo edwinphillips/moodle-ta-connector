@@ -84,32 +84,30 @@ class local_teflacademyconnector_external extends external_api {
 
         $now = time();
 
-        if (!$user = $DB->get_record('user', array('email' => $userdata['email']))) {
-
-            $user = new stdClass();
-            $user->username     = $userdata['username'];
-            $user->password     = $userdata['password'];
-            $user->firstname    = $userdata['firstname'];
-            $user->lastname     = $userdata['lastname'];
-            $user->email        = $userdata['email'];
-            $user->city         = $userdata['city'];
-            $user->country      = $userdata['country'];
-            $user->idnumber     = $userdata['idnumber'];
-            $user->phone1       = $userdata['phone'];
-            $user->mnethostid   = $CFG->mnet_localhost_id;
-            $user->confirmed    = 1;
-
-            if ($userid = user_create_user($user, true)) {
-                // anthing required here?
-            }
-
-        } else {
-
-            $userid = $user->id;
-        }
-
         // Get course Id for requested enrolment.
         if ($course = $DB->get_record('course', array('idnumber' => $courseidnumber))) {
+
+            // Get/Create user.
+            if (!$user = $DB->get_record('user', array('email' => $userdata['email']))) {
+
+                $user = new stdClass();
+                $user->username     = $userdata['username'];
+                $user->password     = $userdata['password'];
+                $user->firstname    = $userdata['firstname'];
+                $user->lastname     = $userdata['lastname'];
+                $user->email        = $userdata['email'];
+                $user->city         = $userdata['city'];
+                $user->country      = $userdata['country'];
+                $user->idnumber     = $userdata['idnumber'];
+                $user->phone1       = $userdata['phone'];
+                $user->mnethostid   = $CFG->mnet_localhost_id;
+                $user->confirmed    = 1;
+
+                $userid = user_create_user($user, true);
+            } else {
+
+                $userid = $user->id;
+            }
 
             // Get course context.
             $coursecontext = context_course::instance($course->id);
@@ -139,13 +137,12 @@ class local_teflacademyconnector_external extends external_api {
                 $record->timestamp    = $now;
 
                 $DB->insert_record('local_teflacademyconnector', $record);
-            }
 
-        } else {
-            // no such course ... ?
+                return true;
+            }
         }
 
-        return true;
+        return false;
     }
 
     /**
