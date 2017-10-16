@@ -111,28 +111,35 @@ class local_teflacademyconnector_external extends external_api {
         // Get course Id for requested enrolment.
         if ($course = $DB->get_record('course', array('idnumber' => $courseidnumber))) {
 
-            // Identify manual enrolment instance.
-            $enrolinstance = $DB->get_record('enrol', array('courseid' => $course->id, 'enrol' => 'manual'), '*', MUST_EXIST);
+            // Get course context.
+            $coursecontext = context_course::instance($course->id);
 
-            // Enrol user as a student using the enrolment instance.
-            $roleid = $DB->get_field('role', 'id', array('shortname' => LOCAL_TEFLACADEMYCONNECTOR_STUDENT_SHORTNAME));
+            // Check that the user does not already have an enrolment in the course.
+            if (!is_enrolled($coursecontext, $userid, '', true)) {
 
-            $timestart = mktime(0, 0, 0, date('n', $now), date('j', $now), date('Y', $now));
-            $timeend = strtotime('+6 month', $timestart);
+                // Identify manual enrolment instance.
+                $enrolinstance = $DB->get_record('enrol', array('courseid' => $course->id, 'enrol' => 'manual'), '*', MUST_EXIST);
 
-            $enrol = enrol_get_plugin('manual');
-            $enrol->enrol_user($enrolinstance, $userid, $roleid, $timestart, $timeend);
+                // Enrol user as a student using the enrolment instance.
+                $roleid = $DB->get_field('role', 'id', array('shortname' => LOCAL_TEFLACADEMYCONNECTOR_STUDENT_SHORTNAME));
 
-            // Record activity.
-            $record = new stdClass();
-            $record->userid       = $userid;
-            $record->orderid      = $taorderid;
-            $record->courseid     = $course->id;
-            $record->tacourseid   = $tacourseid;
-            $record->tacourseinfo = $tacourseinfo;
-            $record->timestamp    = $now;
+                $timestart = mktime(0, 0, 0, date('n', $now), date('j', $now), date('Y', $now));
+                $timeend = strtotime('+6 month', $timestart);
 
-            $DB->insert_record('local_teflacademyconnector', $record);
+                $enrol = enrol_get_plugin('manual');
+                $enrol->enrol_user($enrolinstance, $userid, $roleid, $timestart, $timeend);
+
+                // Record activity.
+                $record = new stdClass();
+                $record->userid       = $userid;
+                $record->orderid      = $taorderid;
+                $record->courseid     = $course->id;
+                $record->tacourseid   = $tacourseid;
+                $record->tacourseinfo = $tacourseinfo;
+                $record->timestamp    = $now;
+
+                $DB->insert_record('local_teflacademyconnector', $record);
+            }
 
         } else {
             // no such course ... ?
