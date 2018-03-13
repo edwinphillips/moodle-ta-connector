@@ -48,7 +48,7 @@ class local_teflacademyconnector_external extends external_api {
                         'email'     => new external_value(PARAM_TEXT),
                         'city'      => new external_value(PARAM_TEXT),
                         'country'   => new external_value(PARAM_TEXT),
-                        'idnumber' => new external_value(PARAM_TEXT),
+                        'idnumber'  => new external_value(PARAM_TEXT),
                         'phone'     => new external_value(PARAM_TEXT),
                     )
                 ),
@@ -61,7 +61,13 @@ class local_teflacademyconnector_external extends external_api {
     }
 
     /**
-     * Returns success or failure
+     * Processes website enrolment request.
+     *
+     * @param array $userdata
+     * @param text $courseidnumber
+     * @param text $taorderid
+     * @param text $tacourseid
+     * @param text $tacourseinfo
      *
      * @return bool success or failure
      */
@@ -151,6 +157,135 @@ class local_teflacademyconnector_external extends external_api {
      * @return external_description
      */
     public static function process_teflacademy_request_returns() {
+
+        return new external_value(PARAM_BOOL);
+    }
+
+    /**
+     * Returns description of method parameters.
+     *
+     * @return external_function_parameters
+     */
+    public static function return_current_enrolment_enddate_parameters() {
+        return new external_function_parameters(
+            array(
+                'email' => new external_value(PARAM_TEXT)
+            )
+        );
+    }
+
+    /**
+     * Returns course and enrolments for user by passed email address.
+     *
+     * @param text $email
+     * @return array
+     */
+    public static function return_current_enrolment_enddate($email) {
+        global $USER, $DB;
+
+        $params = self::validate_parameters(
+            self::return_current_enrolment_enddate_parameters(),
+            array(
+                'email' => $email
+            )
+        );
+
+        $context = context_user::instance($USER->id);
+        self::validate_context($context);
+
+        $sql = "SELECT ue.id, c.id AS courseid, c.fullname AS coursename,
+                       ue.status, ue.timestart AS enrolmentstart, ue.timeend AS enrolmentend
+                  FROM {user_enrolments} ue
+                  JOIN {user} u ON u.id = ue.userid
+                  JOIN {enrol} e ON e.id = ue.enrolid
+                  JOIN {course} c ON c.id = e.courseid
+                 WHERE u.email = ?";
+
+        return $DB->get_records_sql($sql, array($email));
+    }
+
+    /**
+     * Returns description of method result value.
+     *
+     * @return external_description
+     */
+    public static function return_current_enrolment_enddate_returns() {
+
+        return new external_multiple_structure(
+            new external_single_structure(
+                array(
+                    'id' => new external_value(PARAM_INT),
+                    'courseid' => new external_value(PARAM_INT),
+                    'coursename' => new external_value(PARAM_TEXT),
+                    'status' => new external_value(PARAM_INT),
+                    'enrolmentstart' => new external_value(PARAM_INT),
+                    'enrolmentend' => new external_value(PARAM_INT)
+                )
+            )
+        );
+    }
+
+    /**
+     * Returns description of method parameters.
+     *
+     * @return external_function_parameters
+     */
+    public static function extend_enrolment_parameters() {
+
+        return new external_function_parameters(
+            array(
+                'enrolmentdata' => new external_single_structure(
+                    array(
+                        'courseid'  => new external_value(PARAM_INT),
+                        'ueid'      => new external_value(PARAM_INT),
+                        'status'    => new external_value(PARAM_INT),
+                        'timestart' => new external_value(PARAM_INT),
+                        'timeend'   => new external_value(PARAM_INT),
+                    )
+                ),
+            )
+        );
+    }
+
+    /**
+     *
+     *
+     * @return array
+     */
+    public static function extend_enrolment($enrolmentdata) {
+        global $USER, $DB;
+
+        $params = self::validate_parameters(
+            self::extend_enrolment_parameters(),
+            array(
+                'enrolmentdata' => $enrolmentdata,
+            )
+        );
+
+        $context = context_user::instance($USER->id);
+        self::validate_context($context);
+
+        $courseid  = $enrolmentdata['courseid'];
+        $ueid      = $enrolmentdata['ueid'];
+        $status    = $enrolmentdata['status'];
+        $timestart = $enrolmentdata['timestart'];
+        $timeend   = $enrolmentdata['timeend'];
+
+        $enrolinstance = $DB->get_record('enrol', array('courseid' => $courseid, 'enrol' => 'manual'), '*', MUST_EXIST);
+        $userid = $DB->get_field('user_enrolments', 'userid', array('id' => $ueid));
+
+        $enrol = enrol_get_plugin('manual');
+        $enrol->update_user_enrol($enrolinstance, $userid, $status, $timestart, $timeend);
+
+        return true;
+    }
+
+    /**
+     * Returns description of method result value.
+     *
+     * @return external_description
+     */
+    public static function extend_enrolment_returns() {
 
         return new external_value(PARAM_BOOL);
     }

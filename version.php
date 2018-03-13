@@ -25,6 +25,6 @@
 
 defined('MOODLE_INTERNAL') || die();
 
-$plugin->version   = 2017082901;
+$plugin->version   = 2018032000;
 $plugin->requires  = 2017051501;
 $plugin->component = 'local_teflacademyconnector';

@@ -25,7 +25,11 @@
 
 $services = array(
     'The TEFL Academy website connector' => array(
-        'functions'          => array('local_teflacademyconnector_process_request'),
+        'functions'          => array(
+            'local_teflacademyconnector_process_request',
+            'local_teflacademyconnector_return_current_enrolment_enddate',
+            'local_teflacademyconnector_extend_enrolment'
+        ),
         'requiredcapability' => 'local/teflacademyconnector:processrequest',
         'restrictedusers'    => 0,
         'enabled'            => 1,
@@ -41,5 +45,19 @@ $functions = array(
         'classpath'   => 'local/teflacademyconnector/externallib.php',
         'description' => 'Receives data from The TEFL Academy website, creates a Moodle user if neccessary, and initiates a course enrolment of type manual into the requested course.',
         'type'        => 'write',
-    )
+    ),
+    'local_teflacademyconnector_return_current_enrolment_enddate' => array(
+        'classname'   => 'local_teflacademyconnector_external',
+        'methodname'  => 'return_current_enrolment_enddate',
+        'classpath'   => 'local/teflacademyconnector/externallib.php',
+        'description' => 'Returns a UNIX datastamp value of the enddate of any enrolments the passed user has.',
+        'type'        => 'read',
+    ),
+    'local_teflacademyconnector_extend_enrolment' => array(
+        'classname'   => 'local_teflacademyconnector_external',
+        'methodname'  => 'extend_enrolment',
+        'classpath'   => 'local/teflacademyconnector/externallib.php',
+        'description' => 'Extends or re-opens a specific user enrolment by 90 days.',
+        'type'        => 'write',
+    ),
 );
