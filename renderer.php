@@ -32,11 +32,10 @@ class local_teflacademyconnector_renderer extends core_renderer {
         global $CFG;
 
         $table = new flexible_table('local-teflacademyconnector-activity-list');
-        $table->define_columns(array('user', 'course', 'orderid', 'timestamp'));
+        $table->define_columns(array('user', 'orderid', 'timestamp'));
 
         $table->define_headers(array(
             get_string('user'),
-            get_string('course'),
             get_string('orderid', 'local_teflacademyconnector'),
             get_string('timestamp', 'local_teflacademyconnector')
         ));
@@ -46,7 +45,6 @@ class local_teflacademyconnector_renderer extends core_renderer {
         $table->collapsible(false);
 
         $table->column_class('user', 'user');
-        $table->column_class('course', 'course');
         $table->column_class('orderid', 'orderid');
         $table->column_class('timestamp', 'timestamp');
 
@@ -73,7 +71,6 @@ class local_teflacademyconnector_renderer extends core_renderer {
 
                 $userurl = new moodle_url($CFG->wwwroot . '/user/profile.php', array('id' => $user->id));
                 $row[] = html_writer::link($userurl, fullname($user), array('title' => get_string('viewprofile')));
-                $row[] = $activity->course;
                 $row[] = 'OID' . $activity->orderid;
                 $row[] = userdate($activity->timestamp, get_string('strftimedatetime'));
 
